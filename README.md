@@ -125,8 +125,7 @@ Satellite and geological data provide exploration indicators. Actual mineralizat
                               v
                      Interactive Dashboard
 
-
-# 5. Current Development Status
+5. Current Development Status
 Completed
 Phase 1 — Remote Sensing Pipeline
  Sentinel-2 integration
@@ -177,7 +176,7 @@ Interactive Application
  Prospectivity visualization
  Target-zone visualization
 
-# 6. Phase 4B Spatial Validation
+6. Phase 4B Spatial Validation
 The current Phase 4B model was evaluated using 5-fold spatially grouped validation.
 Results
 
@@ -193,7 +192,7 @@ Results
 | Precision@Top 10% |  **0.425 ± 0.1896** |
 | Precision@Top 20% |   **0.44 ± 0.1535** |
 
-# 7. Phase 4B Spatial Validation
+7. Phase 4B Spatial Validation
 The Phase 4B model identified contributions from both geological and remote-sensing information.
 Important features include:
 
@@ -227,7 +226,7 @@ Geo_Boundary_Distance_km
 Lithology_Diversity_3km
 NDMI
 
-# 8. SHAP Explainability
+8. SHAP Explainability
 
 SHAP analysis was performed on the current 117-feature model.
 
@@ -254,19 +253,19 @@ Terrain
 Spectral information
 Radar information
 
-# 9. Data Sources
+9. Data Sources
 
 The project uses publicly available geological, satellite, terrain and mineral-occurrence datasets. The current Balaghat implementation uses these datasets for model development and validation, while the next stage will generalize the same data architecture to India-wide operation.
 
 ---
 
-## 9.1 Geological Survey of India (GSI) — Manganese Occurrences
+9.1 Geological Survey of India (GSI) — Manganese Occurrences
 
-**Source:** Geological Survey of India (GSI) / Open Government Data (OGD)
+Source: Geological Survey of India (GSI) / Open Government Data (OGD)
 
-**Dataset:** Location of Manganese Ore Deposits in India and its Salient Features
+Dataset: Location of Manganese Ore Deposits in India and its Salient Features
 
-**Official source:**
+Official source:
 
 https://www.data.gov.in/catalog/location-manganese-ore-deposits-india-and-its-salient-features
 
@@ -284,7 +283,7 @@ Relevant fields include:
 - Metallogenesis
 - Morphogenesis
 
-### Project usage
+Project usage
 
 The occurrence data is used to:
 
@@ -294,7 +293,7 @@ The occurrence data is used to:
 - Validate prospectivity predictions.
 - Provide geological context for manganese mineralization.
 
-### Important limitation
+Important limitation
 
 Known occurrences represent **observed mineralization locations**, not the complete distribution of manganese deposits.
 
@@ -302,21 +301,21 @@ Unknown locations must therefore not automatically be interpreted as true negati
 
 ---
 
-## 9.2 GSI / NGDR — Geological and Lithological Data
+9.2 GSI / NGDR — Geological and Lithological Data
 
-**Source:** Geological Survey of India (GSI) / National Geoscience Data Repository (NGDR)
+Source: Geological Survey of India (GSI) / National Geoscience Data Repository (NGDR)
 
-**NGDR portal:**
+NGDR portal:
 
 https://geodataindia.gov.in/
 
-**GSI Open Government Data:**
+GSI Open Government Data:
 
 https://www.data.gov.in/ministrydepartment/Geological%20Survey%20of%20India
 
 NGDR provides access to standardized geoscientific datasets that can be used for GIS, spatial analysis and AI/ML applications.
 
-### Project usage
+Project usage
 
 The project uses geological/lithological information to represent the geological environment surrounding potential manganese mineralization.
 
@@ -338,27 +337,27 @@ Derived spatial features include:
 - Formation diversity
 - Geological proxies
 
-### Balaghat pilot
+Balaghat pilot
 
 For the Balaghat pilot, the NGDR-derived lithological dataset was spatially filtered to the study area.
 
 The local extraction contains approximately:
 
-**14,443 geological/lithological records**
+14,443 geological/lithological records
 
 after processing the relevant full dataset.
 
-### Important limitation
+Important limitation
 
 Geological data coverage and attribute completeness can vary between regions.
 
-Large raw NGDR datasets are intentionally **not stored in this GitHub repository** because of their size.
+Large raw NGDR datasets are intentionally not stored in this GitHub repository because of their size.
 
 ---
 
-## 9.3 GSI Geological Maps
+9.3 GSI Geological Maps
 
-**Source:** Geological Survey of India
+Source: Geological Survey of India
 
 GSI geological maps provide information about:
 
@@ -374,7 +373,7 @@ A publicly available geological maps dataset is also listed through the National
 
 https://nwdp.nwic.in/dataset/geological-maps
 
-### Project usage
+Project usage
 
 Geological maps support:
 
@@ -386,16 +385,16 @@ Geological maps support:
 
 ---
 
-## 9.4 Sentinel-2 Multispectral Imagery
+9.4 Sentinel-2 Multispectral Imagery
 
-**Source:** Copernicus Sentinel-2 / European Space Agency
+Source: Copernicus Sentinel-2 / European Space Agency
 
-**Google Earth Engine dataset:**
+Google Earth Engine dataset:
 
-```text
+
 COPERNICUS/S2_SR_HARMONIZED
 
-## 9.5 GitHub — Indian Land Features / NGDR-derived Spatial Data
+9.5 GitHub — Indian Land Features / NGDR-derived Spatial Data
 
 A public GitHub project providing processed Indian spatial datasets derived from government geospatial sources:
 
@@ -406,16 +405,16 @@ Relevant releases include NGDR-derived geological/lithological datasets such as:
 NGDR_Geology_2M.geojsonl
 NGDR_Lithology_50k.
 
-## 9.6 Sentinel-1 SAR Data
+9.6 Sentinel-1 SAR Data
 
-**Source:** Copernicus Sentinel-1 / European Space Agency
+Source:Copernicus Sentinel-1 / European Space Agency
 
-**Google Earth Engine dataset:**
+Google Earth Engine dataset:
 
-```text
+
 COPERNICUS/S1_GRD
 
-## 9.7 SRTM Digital Elevation Data
+9.7 SRTM Digital Elevation Data
 
 Source: NASA / USGS
 
@@ -441,7 +440,7 @@ Official documentation:
 
 https://developers.google.com/earth-engine/datasets/catalog/USGS_SRTMGL1_003
 
-# 10. Project Structure
+10. Project Structure
 MOIL_SIH_2026/
 │
 ├── app/
@@ -489,7 +488,7 @@ MOIL_SIH_2026/
 ├── requirements.txt
 └── .gitignore
 
-# 11. Project Architecture
+11. Project Architecture
                          ┌───────────────────────┐
                          │     PUBLIC DATA       │
                          └───────────┬───────────┘
