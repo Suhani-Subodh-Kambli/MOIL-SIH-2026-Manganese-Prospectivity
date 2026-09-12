@@ -1,4 +1,4 @@
-# MOIL SIH 2026 — AI-Assisted Manganese Exploration & Production Intelligence
+# MOIL SIH 2026 -  AI-Assisted Manganese Exploration & Production Intelligence
 
 ## Smart India Hackathon 2026
 
