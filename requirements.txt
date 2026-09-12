@@ -7,3 +7,6 @@ shap==0.51.0
 joblib==1.5.3
 shapely
 xlrd
+streamlit
+folium
+streamlit-folium
