@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.env
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Secrets / credentials
+*.pem
+*.key
+credentials*.json
+service-account*.json
+
+# Large raw geology data
+data/geology/extracted/
+data/geology/*.7z
+data/geology/**/*.7z
+data/geology/balaghat/balaghat_lithology.geojsonl
+
+# Generated outputs
+outputs/
+
+# Temporary files
+*.tmp
+*.bak
+
+# Large NGDR geology archives
+data/geology/*.geojsonl.7z.*
+data/geology/*.geojsonl
+data/geology/extracted/
+
+# Generated outputs
+outputs/
