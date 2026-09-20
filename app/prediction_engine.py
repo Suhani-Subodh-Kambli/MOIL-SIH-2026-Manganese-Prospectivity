@@ -45,13 +45,19 @@ class ProspectivityEngine:
         self,
         latitude: float,
         longitude: float,
-        model_type: str = "ensemble"
+        model_type: str = "ensemble",
+        pipeline: str = "auto"
     ) -> Dict[str, Any]:
         """
         Evaluate prospectivity at (latitude, longitude).
         Supports arbitrary coordinates anywhere in India.
         """
-        res = self.engine.predict_point(latitude, longitude, model_type=model_type)
+        res = self.engine.predict_point(
+            latitude,
+            longitude,
+            model_type=model_type,
+            pipeline=pipeline
+        )
 
         # Ensure compatibility with app.py legacy dictionary keys
         res["grid_latitude"] = res.get("grid_latitude", float(latitude))
@@ -63,7 +69,8 @@ class ProspectivityEngine:
         self,
         coordinates: List[Tuple[float, float]],
         max_points: int = 10000,
-        model_type: str = "ensemble"
+        model_type: str = "ensemble",
+        pipeline: str = "auto"
     ) -> Dict[str, Any]:
         """
         Evaluate prospectivity within an arbitrary polygon [(lon, lat), ...].
@@ -72,7 +79,8 @@ class ProspectivityEngine:
             coordinates,
             resolution_km=2.0,
             max_points=max_points,
-            model_type=model_type
+            model_type=model_type,
+            pipeline=pipeline
         )
 
     def get_map_data(self) -> pd.DataFrame:

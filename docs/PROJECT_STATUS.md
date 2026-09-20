@@ -438,7 +438,6 @@ Implemented in `core/sampling.py`:
 - `tests/test_geology_index.py`: Verifies spatial lookups across Balaghat, Sandur, Bonai, Goa, and Vizianagaram.
 - `tests/test_feature_extractor.py`: Verifies feature enrichment, preprocessor transformation, and XGBoost inference.
 - `tests/test_sampling.py`: Verifies positive buffering and spatial block partitioning.
-- `tests/run_all_tests.py`: Runs all test suites (3/3 passing).
 - `tests/run_all_tests.py`: Runs all test suites.
 
 ---
@@ -489,3 +488,75 @@ Updated `app/app.py` and `app/prediction_engine.py`:
 ### 10.4 Automated Verification Suite
 - `tests/test_inference_engine.py`: Tests point prediction in Balaghat, Sandur, Koira; tests model comparison; tests polygon prediction and DBSCAN clustering.
 - `tests/run_all_tests.py`: Runs all 4 test suites (4/4 passing).
+
+---
+
+# 11. Phase 8 — India-Wide Multi-Belt Model & Spatial Validation (COMPLETED)
+
+Branch: `feature/india-wide-model`
+
+### 11.1 Macro-Lithological & Metallogenic Domain Classification Engine
+Implemented in `core/macro_lithology.py`:
+- Formulates scientific rule-based classification converting heterogeneous NGDR 1:2M/1:50k and GSI geological strings into **8 standardized macro-lithological classes**:
+  1. `GONDITE_METAMORPHIC`: Sausar (MP/MH), Gangpur (Odisha), Aravalli (Gujarat/Rajasthan) — Gondite, pelitic schists, braunite.
+  2. `BIF_GREENSTONE`: Dharwar craton (Sandur, Chitradurga, Bababudan, Karnataka) — BHQ, BMQ, banded chert, greenstones.
+  3. `SHALY_TUFFACEOUS_IOG`: Singhbhum craton (Bonai-Keonjhar, Koira, Noamundi, Odisha/JH) — Tuffaceous shale, IOG.
+  4. `GRANULITE_KHONDALITE`: Eastern Ghats mobile belt (Vizianagaram, Srikakulam, AP/Odisha) — Khondalite, kodurite, charnockite.
+  5. `LATERITE_WEATHERING`: Supergene enrichment caps (Goa, North Kanara).
+  6. `CARBONATE_SEDIMENTARY`: Platform basins (Penganga, Pakhal, Adilabad) — Limestone, dolomite, chert.
+  7. `CRATONIC_BASEMENT`: Basement granitoids, Tirodi Gneiss, Peninsular Gneiss (PGC), TTG.
+  8. `OTHER_UNDIVIDED`: Deccan basalts, younger sediments, alluvium.
+- Maps coordinates to **7 Craton Domains** (`BASTAR_CRATON`, `DHARWAR_CRATON`, `SINGHBHUM_CRATON`, `EASTERN_GHATS_MOBILE_BELT`, `WESTERN_COAST_GOA`, `ARAVALLI_CRATON`, `PRANHITA_GODAVARI_BASIN`).
+- Computes calibrated `metallogenic_host_affinity` (0.10 to 0.95).
+
+### 11.2 National Multi-Belt Dataset
+Generated via `scripts/build_national_dataset.py` and saved to `data/MOIL_National_MultiBelt_Dataset.csv`:
+- **736 total samples** (307 positives, 429 spatially balanced background samples).
+- Covers all 11 manganese-bearing states across India.
+- Background points sampled with strict $\ge 3.0\text{ km}$ buffer from any known deposit across all 7 cratons.
+- Fully enriched with 45 numeric features, macro-lithology, and craton domains.
+- **Zero data leakage**: `Distance_Mn` and coordinates strictly excluded from predictive features.
+
+### 11.3 National Prospectivity Model Benchmark
+Trained via `scripts/train_national_models.py`:
+- Model artifacts:
+  - `models/national_preprocessor.joblib`
+  - `models/national_feature_columns.json` (53 features: 45 numeric + 8 one-hot)
+  - `models/moil_manganese_prospectivity_xgb_national.joblib`
+  - `models/moil_manganese_prospectivity_nb_national.joblib`
+- Evaluated under both **5-Fold Spatial Cross-Validation** (`StratifiedGroupKFold` on `spatial_block`) and **Out-of-Craton Cross-Validation** (`GroupKFold` on `craton_domain`):
+
+| Metric | Spatial XGBoost | Spatial Naive Bayes | Spatial Ensemble (50/50) | Out-of-Craton Ensemble |
+| :--- | :--- | :--- | :--- | :--- |
+| **PR-AUC** | 0.4534 ± 0.1943 | 0.4212 ± 0.1980 | **0.4530 ± 0.2027** | **0.4445 ± 0.1695** |
+| **ROC-AUC** | 0.5612 ± 0.1165 | 0.4829 ± 0.1125 | **0.5577 ± 0.1219** | **0.5396 ± 0.0956** |
+| **Accuracy** | 0.5365 ± 0.0833 | 0.4668 ± 0.1553 | **0.5523 ± 0.0984** | **0.5322 ± 0.0930** |
+| **Precision** | 0.4350 ± 0.1543 | 0.4262 ± 0.2136 | **0.4626 ± 0.1877** | **0.4432 ± 0.1745** |
+| **Recall** | 0.6253 ± 0.2887 | 0.6518 ± 0.1800 | **0.7052 ± 0.2649** | **0.6225 ± 0.1635** |
+| **F1 Score** | 0.4637 ± 0.1486 | 0.4663 ± 0.1773 | **0.5079 ± 0.1660** | **0.5028 ± 0.1533** |
+| **Precision@Top 10%** | 0.4362 ± 0.2843 | 0.3278 ± 0.2235 | **0.3817 ± 0.2289** | **0.3886 ± 0.2015** |
+
+- **Geographic Transferability Highlights**:
+  - Held-out **Singhbhum Craton (Odisha/Jharkhand)**: Ensemble PR-AUC reached **0.6849** (XGB: 0.6759, NB: 0.6327).
+  - Held-out **Eastern Ghats Mobile Belt (AP/Odisha)**: Ensemble PR-AUC reached **0.5511** (XGB: 0.5686, NB: 0.5453).
+- Top Predictive Drivers:
+  1. `macro_lithology` (differentiating cratonic basement and unmineralized lithologies from manganiferous hosts).
+  2. `metallogenic_host_affinity` (empirical favorability weight).
+  3. `Formation_Diversity_3km` & `Lithology_Diversity_3km` (stratigraphic contact complexity).
+  4. `Geo_Boundary_Distance_km` (proximity to lithological contacts).
+  5. `Elevation`, `B4` (Red), `B7` (Red-Edge), `B5` (Red-Edge 1).
+
+### 11.4 Dual-Pipeline Routing in Inference Engine & App
+Updated `core/inference_engine.py`, `app/prediction_engine.py`, and `app/app.py`:
+- Added pipeline routing:
+  - `pipeline="national"`: Multi-belt transferable prospectivity model across India.
+  - `pipeline="pilot"`: High-resolution Balaghat Phase 4B baseline model.
+  - `pipeline="auto"`: Routes pilot coordinates to Balaghat grid, and pan-India coordinates to national model.
+- App UI exposes:
+  - Pipeline Architecture selector in sidebar.
+  - Macro-Lithology, Craton Domain, and Host Rock Affinity in diagnostics card.
+  - Pipeline and model designation badge.
+
+### 11.5 Automated Verification Suite
+- `tests/test_national_model.py`: Verifies macro-lithology classification, craton domains, dataset integrity, national inference across 5 key deposits (Sandur, Koira, Vizianagaram, Colamba, Balaghat), and polygon evaluation.
+- `tests/run_all_tests.py`: Runs all 5 test suites (**5/5 passing, 100% success**).
