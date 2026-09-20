@@ -10,3 +10,4 @@ xlrd
 streamlit
 folium
 streamlit-folium
+geopandas

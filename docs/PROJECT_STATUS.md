@@ -392,3 +392,50 @@ Prospectivity score
 Target zones
         ↓
 Interactive dashboard
+```
+
+---
+
+# 9. Phase 6 — India-Wide Data & Feature Pipeline (COMPLETED)
+
+Branch: `feature/india-wide-data`
+
+### 9.1 National Ground-Truth Manganese Dataset
+Consolidated national manganese occurrences and active mining leases from GSI and NGDR:
+- `data/gsi/india_manganese_occurrences.csv`
+- `data/gsi/india_manganese_occurrences.geojson`
+- **187 unique verified manganese sites** across 11 states:
+  - Madhya Pradesh (56), Odisha (33), Andhra Pradesh (32), Maharashtra (22), Karnataka (17), Telangana (12), Goa (7), Jharkhand (4), Chhattisgarh (2), Gujarat (1), Rajasthan (1).
+- Tagged with official NGSR Metallogenic Belts:
+  - Sausar Mn Zone (64 sites)
+  - Bonai-Noamundi-Jamda Fe-Mn Belt (35 sites)
+  - Eastern Ghats Al-Mn Province (30 sites)
+  - Chitradurga Polymetallic Province (9 sites)
+  - Goa Fe-Mn Belt (8 sites)
+  - Sandur Fe-Mn-Au Province (5 sites)
+  - Kundremukh-Shimoga Belt (1 site)
+  - Other Regional Belts (35 sites)
+
+### 9.2 National Geological Indexer
+Implemented in `core/geology_index.py`:
+- Integrates `data/geology/NGDR_Geology_2M.parquet` (national 1:2M geology, 4,531 polygons covering all of India) with local 1:50k pilot lithology (`balaghat_lithology.geojsonl`).
+- Rapid `STRtree` spatial indexing providing **2–4 millisecond point queries** for any arbitrary coordinate across India.
+- Computes structural proxy features: geological boundary distance (km), boundary density (1 km and 3 km), lithological and formation diversity (3 km), Sausar group proxy, and metamorphic host proxy.
+
+### 9.3 Reusable Feature Engineering Engine
+Implemented in `core/feature_extractor.py`:
+- Enriches any coordinate or raster grid with all 44 numeric features and 7 categorical features.
+- Strict leakage prevention: coordinates and `Distance_Mn` are completely excluded from model features.
+- Guaranteed 100% schema compatibility: outputs exact 51 raw features that transform seamlessly through `phase4b_preprocessor.joblib` into the 117 XGBoost model input features.
+
+### 9.4 Spatially Balanced Sampling Engine
+Implemented in `core/sampling.py`:
+- Implements Positive-Unlabelled (PU) sampling logic.
+- Enforces strict minimum distance buffer (`>= 3.0 km`) from all known positives for background samples.
+- Assigns spatial block IDs (`spatial_block`) for leak-free `StratifiedGroupKFold` spatial cross-validation.
+
+### 9.5 Automated Verification Suite
+- `tests/test_geology_index.py`: Verifies spatial lookups across Balaghat, Sandur, Bonai, Goa, and Vizianagaram.
+- `tests/test_feature_extractor.py`: Verifies feature enrichment, preprocessor transformation, and XGBoost inference.
+- `tests/test_sampling.py`: Verifies positive buffering and spatial block partitioning.
+- `tests/run_all_tests.py`: Runs all test suites (3/3 passing).

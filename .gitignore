@@ -22,12 +22,12 @@ service-account*.json
 data/geology/extracted/
 data/geology/*.7z
 data/geology/**/*.7z
+data/geology/*.parquet
 data/geology/balaghat/balaghat_lithology.geojsonl
+data/gsi/*.parquet
 
-# Generated outputs
-outputs/
-
-# Temporary files
+# Temporary files & scratch
+scratch/
 *.tmp
 *.bak
 
