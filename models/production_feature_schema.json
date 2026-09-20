@@ -1,0 +1,13 @@
+[
+  "monthly_target_tonnes",
+  "rainfall_mm",
+  "fleet_availability_pct",
+  "fleet_utilization_pct",
+  "unplanned_downtime_hrs",
+  "stripping_ratio_deficit",
+  "shaft_utilization_pct",
+  "power_outage_hrs",
+  "is_opencast",
+  "is_underground",
+  "is_mixed"
+]

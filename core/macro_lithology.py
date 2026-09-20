@@ -206,3 +206,4 @@ def enrich_with_macro_lithology(df: pd.DataFrame) -> pd.DataFrame:
     df["craton_domain"] = cratons
 
     return df
+

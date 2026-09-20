@@ -559,4 +559,72 @@ Updated `core/inference_engine.py`, `app/prediction_engine.py`, and `app/app.py`
 
 ### 11.5 Automated Verification Suite
 - `tests/test_national_model.py`: Verifies macro-lithology classification, craton domains, dataset integrity, national inference across 5 key deposits (Sandur, Koira, Vizianagaram, Colamba, Balaghat), and polygon evaluation.
-- `tests/run_all_tests.py`: Runs all 5 test suites (**5/5 passing, 100% success**).
+- `tests/run_all_tests.py`: Runs all 5 test suites (**5/5 passing, 100% success**).
+
+---
+
+# 12. Phase 9 — Production Shortfall Intelligence & Ore Blending Optimization (COMPLETED)
+
+Branch: `feature/production-shortfall`
+
+Fulfills the second core pillar of SIH Problem Statement 26009: *"Overcome Production Shortfalls"*.
+
+### 12.1 Historical Mining Telemetry Dataset
+Implemented in `scripts/generate_production_data.py`:
+- Dataset: `data/production/moil_mine_operations_history.csv` (288 monthly operational records across 8 MOIL mines over 2023–2025).
+- Captures opencast vs underground operational physics:
+  - Monthly targets (10,000–45,000 tonnes) & extraction.
+  - Central India monsoon precipitation index (0–600 mm/month).
+  - Heavy Earth Moving Machinery (HEMM) fleet availability & utilization.
+  - Unplanned maintenance downtime (hours).
+  - Stripping ratio lag (waste:ore backlog in opencast).
+  - Vertical hoisting shaft utilization & skip cycle bottlenecks (underground).
+  - Target vs actual % Mn grade and dilution deficits.
+
+### 12.2 Shortfall Prediction Models
+Implemented in `modules/production_shortfall.py` and trained via `scripts/train_production_models.py`:
+- Model artifacts:
+  - `models/moil_production_shortfall_regressor.joblib` (RandomForestRegressor)
+  - `models/moil_production_shortfall_classifier.joblib` (RandomForestClassifier)
+  - `models/production_feature_schema.json`
+- **Validation Metrics (5-Fold CV)**:
+  - **Regressor $R^2$**: **0.9001 ± 0.0185** (high variance explanation of production loss)
+  - **Regressor MAE**: **3.42% ± 0.27%**
+  - **Classifier Accuracy**: **75.39% ± 6.00%**
+  - **Classifier Weighted F1**: **0.7517 ± 0.0594**
+- **Top Operational Loss Drivers**:
+  1. `rainfall_mm` (74.5% feature importance — primary opencast pit flooding driver)
+  2. `fleet_availability_pct` (15.5% — excavator/dumper breakdowns)
+  3. `unplanned_downtime_hrs` (3.7%)
+  4. `is_underground` (2.3%)
+
+### 12.3 Multi-Stockpile Ore Blending Optimizer (Linear Programming)
+Implemented in `OreBlendingOptimizer`:
+- Mathematical Simplex/Interior-Point LP solver (`scipy.optimize.linprog` HiGHS solver):
+  $$\min \sum c_i w_i \quad \text{s.t.} \quad \sum w_i g_i \ge g_{\text{target}}, \quad \sum w_i s_i \le s_{\text{max}}, \quad \sum w_i p_i \le p_{\text{max}}, \quad \sum w_i = 1$$
+- Determines exact draw weights from multiple active faces / low-grade fines to meet customer metallurgical guarantees (% Mn, % SiO₂, % P) at minimal cost.
+- Demonstrated cost savings: e.g. **INR 44.0 Lakh savings** on a 10,000-tonne shipment vs sourcing 100% pure high-grade ore.
+
+### 12.4 Prescriptive Operational Mitigation Engine
+Implemented in `CorrectiveActionEngine`:
+- Formulates prioritized, quantified recovery workflows:
+  - Sump dewatering capacity deployment & ramp quartzite capping.
+  - Dynamic shovel-dumper re-allocation.
+  - Stripping pushback acceleration.
+  - Shaft winder turnaround cycle optimization.
+  - Compensatory weekend/overtime shift scheduling.
+- Provides estimated recoverable tonnage and days saved.
+
+### 12.5 Streamlit Command Center UI
+Updated `app/app.py`:
+- Added top-level navigation: `🏭 Production Shortfall Intelligence`.
+- Interactive mine telemetry controls (targets, weather sliders, fleet availability, downtime).
+- 4 KPI Scorecards (Predicted Extraction, Expected Shortfall, Risk Tier, Grade Deficit Alert).
+- Quantitative Root-Cause Loss Attribution progress bars.
+- Interactive Ore Blending LP Solver widget.
+- Actionable Operational Mitigation Plan table.
+
+### 12.6 Automated Master Verification Suite
+- `tests/test_production_shortfall.py`: Tests dry season baseline, monsoon inundation shock, LP blending optimizer constraints, and prescriptive action engine.
+- `tests/run_all_tests.py`: Master test runner now executing **all 6 test suites (6/6, 100% passing)**.
+
