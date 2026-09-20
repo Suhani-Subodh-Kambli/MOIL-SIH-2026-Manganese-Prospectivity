@@ -208,3 +208,4 @@ class ProspectivityFeatureExtractor:
 
         all_cols = self.NUMERIC_COLUMNS + self.CATEGORICAL_COLUMNS
         return enriched[all_cols].copy()
+

@@ -129,3 +129,4 @@ class SpatiallyBalancedSampler:
         combined = self.assign_spatial_blocks(combined)
 
         return combined
+
