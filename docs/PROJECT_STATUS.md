@@ -439,3 +439,53 @@ Implemented in `core/sampling.py`:
 - `tests/test_feature_extractor.py`: Verifies feature enrichment, preprocessor transformation, and XGBoost inference.
 - `tests/test_sampling.py`: Verifies positive buffering and spatial block partitioning.
 - `tests/run_all_tests.py`: Runs all test suites (3/3 passing).
+- `tests/run_all_tests.py`: Runs all test suites.
+
+---
+
+# 10. Phase 7 — Inference Engine Decoupling & Naive Bayes Model (COMPLETED)
+
+Branch: `feature/inference-engine`
+
+### 10.1 Naive Bayes Prospectivity Model
+Trained and spatially validated a classical probabilistic **Gaussian Naive Bayes model** on the exact same 117 transformed features and 5-fold `StratifiedGroupKFold` spatial blocks:
+- Script: `scripts/train_phase4b_nb.py`
+- Model artifact: `models/moil_manganese_prospectivity_nb_phase4b.joblib`
+- Metrics: `outputs/phase4b_nb_spatial_metrics.csv`
+- Model Benchmark comparison: `outputs/phase4b_model_comparison.csv`
+
+**Spatial Validation Benchmark (XGBoost vs. Naive Bayes):**
+
+| Metric | XGBoost (Phase 4B) | Naive Bayes (GaussianNB) | Improvement / Takeaway |
+| :--- | :--- | :--- | :--- |
+| **ROC-AUC** | 0.6210 ± 0.2085 | 0.6066 ± 0.0646 | Naive Bayes std is 3x lower (higher spatial stability) |
+| **PR-AUC** | 0.4746 ± 0.1422 | **0.5294 ± 0.0675** | **+5.48% higher PR-AUC** |
+| **Accuracy** | 0.6556 ± 0.0514 | **0.6889 ± 0.0400** | **+3.33% higher overall accuracy** |
+| **Precision** | 0.3743 ± 0.2626 | **0.5923 ± 0.1615** | **+21.80% higher precision** |
+| **Recall** | 0.1833 ± 0.1733 | **0.3167 ± 0.1003** | **+13.34% higher positive recall** |
+| **F1 Score** | 0.2391 ± 0.2065 | **0.3985 ± 0.0840** | **+15.94% higher F1** |
+| **Precision@Top 5%** | 0.5000 ± 0.3953 | **0.8000 ± 0.2092** | **80% precision at peak decile** |
+| **Precision@Top 10%** | 0.4250 ± 0.1896 | **0.7500 ± 0.1250** | **75% precision in top 10%** |
+| **Precision@Top 20%** | 0.4400 ± 0.1535 | **0.5333 ± 0.0471** | **53.3% precision in top 20%** |
+
+### 10.2 Decoupled Unified Inference Engine
+Implemented in `core/inference_engine.py`:
+- **Arbitrary Point Prediction**: Dynamically derives geology, contacts, and proxies anywhere in India (e.g. Sandur, Bellary; Bonai-Keonjhar, Odisha; Goa; Vizianagaram, AP) while retaining exact 1:50k pilot resolution in Balaghat.
+- **Arbitrary Polygon Prediction**: Generates adaptive spatial grids on-the-fly inside user polygons anywhere in India, extracts features, computes scores, and runs **DBSCAN spatial clustering** to output contiguous high-priority **Target Zones**.
+- **Multi-Model Support**: Allows runtime selection between:
+  - `xgboost`: Non-linear gradient boosted trees.
+  - `naive_bayes`: Probabilistic conditional independence model.
+  - `ensemble`: 50/50 weighted combination combining decision trees with Bayesian likelihood.
+
+### 10.3 Streamlit Application Upgrade
+Updated `app/app.py` and `app/prediction_engine.py`:
+- Unlocked coordinates across all of India (Lat 6.00°N–38.00°N, Lon 68.00°E–98.00°E).
+- Added quick-jump preset selector for major Indian manganese hubs (Balaghat, Ukwa, Tirodi, Dongri Buzurg, Sandur, Bonai, Garbham, Colamba).
+- Added AI Model Selector in the sidebar (Ensemble, XGBoost, Naive Bayes).
+- Added Geological & Structural diagnostics panel (Formation, Group, Boundary Distance, Contact Density 1km/3km, Lithology Diversity).
+- Added nearest known GSI manganese occurrence reference and metallogenic belt distance.
+- Preserved 100% backward compatibility for Balaghat pilot verification.
+
+### 10.4 Automated Verification Suite
+- `tests/test_inference_engine.py`: Tests point prediction in Balaghat, Sandur, Koira; tests model comparison; tests polygon prediction and DBSCAN clustering.
+- `tests/run_all_tests.py`: Runs all 4 test suites (4/4 passing).
